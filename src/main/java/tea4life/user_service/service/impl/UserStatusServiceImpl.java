@@ -43,7 +43,7 @@ public class UserStatusServiceImpl implements tea4life.user_service.service.User
                 user.getOnBoarded(),
                 user.getFullName(),
                 user.getEmail(),
-                user.getRole() != null ? user.getRole().toString() : "",
+                user.getRole() != null ? user.getRole().getName() : "",
                 user.getAvatarUrl());
     }
 
