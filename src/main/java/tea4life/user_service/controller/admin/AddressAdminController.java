@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tea4life.user_service.dto.base.ApiResponse;
 import tea4life.user_service.dto.request.CreateAddressRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/admin/users/{keycloakId}/addresses")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class AddressAdminController {
 
     AdminAddressService adminAddressService;

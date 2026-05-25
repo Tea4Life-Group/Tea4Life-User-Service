@@ -27,4 +27,6 @@ public interface UserService {
 
     @Transactional(readOnly = true)
     UserPermissionsResponse getUserPermissions(String keycloakId);
+
+    void assignRoleByName(String keycloakId, String roleName);
 }

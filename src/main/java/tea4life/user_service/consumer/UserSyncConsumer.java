@@ -9,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import tea4life.user_service.model.Role;
 import tea4life.user_service.model.User;
+import tea4life.user_service.model.constant.RoleName;
+import tea4life.user_service.repository.RoleRepository;
 import tea4life.user_service.repository.UserRepository;
 
 import java.util.concurrent.TimeUnit;
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class UserSyncConsumer {
 
     UserRepository userRepository;
+    RoleRepository roleRepository;
     StringRedisTemplate stringRedisTemplate;
     ObjectMapper objectMapper;
 
@@ -81,6 +85,7 @@ public class UserSyncConsumer {
             newUser.setKeycloakId(keycloakId);
             newUser.setEmail(email);
             newUser.setOnBoarded(false);
+            newUser.setRole(resolveDefaultRole());
             userRepository.save(newUser);
 
             log.info("Successfully persisted new user to DB.");
@@ -92,5 +97,10 @@ public class UserSyncConsumer {
         }
     }
 
+    private Role resolveDefaultRole() {
+        return roleRepository
+                .findByName(RoleName.MEMBER)
+                .orElseThrow(() -> new IllegalStateException("Missing default role: " + RoleName.MEMBER));
+    }
 
 }

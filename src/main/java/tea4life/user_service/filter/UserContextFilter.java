@@ -31,6 +31,7 @@ public class UserContextFilter implements Filter {
 
         String email = httpRequest.getHeader("X-User-Email");
         String userKeycloakId = httpRequest.getHeader("X-User-KeycloakId");
+        String role = httpRequest.getHeader("X-User-Role");
         String authoritiesRaw = httpRequest.getHeader("X-User-Authorities");
 
         /**
@@ -47,6 +48,18 @@ public class UserContextFilter implements Filter {
             authorities = Arrays.stream(authoritiesRaw.split(","))
                     .filter(auth -> !auth.isBlank())
                     .map(SimpleGrantedAuthority::new)
+                    .toList();
+        }
+
+        if (hasText(role)) {
+            List<SimpleGrantedAuthority> roleAuthorities = List.of(
+                    new SimpleGrantedAuthority(normalizeRole(role))
+            );
+            authorities = authorities.isEmpty()
+                    ? roleAuthorities
+                    : java.util.stream.Stream
+                    .concat(authorities.stream(), roleAuthorities.stream())
+                    .distinct()
                     .toList();
         }
 
@@ -86,5 +99,9 @@ public class UserContextFilter implements Filter {
 
     private boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private String normalizeRole(String role) {
+        return role.replaceFirst("^ROLE_", "").toUpperCase();
     }
 }

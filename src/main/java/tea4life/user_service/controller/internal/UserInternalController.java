@@ -3,6 +3,7 @@ package tea4life.user_service.controller.internal;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,15 @@ public class UserInternalController {
         return ApiResponse.<UserPermissionsResponse>builder()
                 .data(userService.getUserPermissions(keycloakId))
                 .build();
+    }
+
+    @PatchMapping("/{keycloakId}/role/{roleName}")
+    public ApiResponse<Void> assignRole(
+            @PathVariable String keycloakId,
+            @PathVariable String roleName
+    ) {
+        userService.assignRoleByName(keycloakId, roleName);
+        return ApiResponse.<Void>builder().build();
     }
 
     @PostMapping("/{userId}/onboarding")

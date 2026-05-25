@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tea4life.user_service.dto.base.ApiResponse;
 import tea4life.user_service.dto.base.PageResponse;
@@ -25,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/admin/roles")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class RoleAdminController {
 
     RoleService roleService;

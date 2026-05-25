@@ -23,7 +23,9 @@ import tea4life.user_service.dto.request.*;
 import tea4life.user_service.dto.response.UserPermissionsResponse;
 import tea4life.user_service.dto.response.UserProfileResponse;
 import tea4life.user_service.model.Permission;
+import tea4life.user_service.model.Role;
 import tea4life.user_service.model.User;
+import tea4life.user_service.repository.RoleRepository;
 import tea4life.user_service.repository.UserRepository;
 import tea4life.user_service.service.UserService;
 
@@ -45,6 +47,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     StorageClient storageClient;
     Keycloak keycloak;
+    RoleRepository roleRepository;
 
     KafkaTemplate<@NonNull String, @NonNull String> kafkaTemplate;
 
@@ -213,7 +216,23 @@ public class UserServiceImpl implements UserService {
                 ? user.getRole().getPermissions().stream().map(Permission::getName).collect(Collectors.toSet())
                 : Collections.emptySet();
 
-        return new UserPermissionsResponse(user.getEmail(), permissions);
+        String role = user.getRole() != null ? user.getRole().getName() : "";
+
+        return new UserPermissionsResponse(user.getEmail(), role, permissions);
+    }
+
+    @Override
+    public void assignRoleByName(String keycloakId, String roleName) {
+        User user = userRepository
+                .findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy người dùng"));
+
+        Role role = roleRepository
+                .findByName(roleName.toUpperCase())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy role: " + roleName));
+
+        user.setRole(role);
+        userRepository.save(user);
     }
 
     private void verifyOldPassword(String email, String oldPassword) {
